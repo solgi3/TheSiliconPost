@@ -1,0 +1,99 @@
+@using Umbraco.Cms.Web.Common.PublishedModels
+@using TheSiliconPost.Models
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    var siteUrl = Context.Request.Scheme + "://" + Context.Request.Host;
+    var siteName = "The Silicon Post";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - @siteName</title>
+    
+    @if (ViewBag.MetaDescription != null)
+    {
+        <meta name="description" content="@ViewBag.MetaDescription" />
+    }
+    
+    @if (ViewBag.MetaKeywords != null)
+    {
+        <meta name="keywords" content="@ViewBag.MetaKeywords" />
+    }
+    
+    @* OpenGraph Tags *@
+    @if (ViewBag.OpenGraphTags != null)
+    {
+        var ogTags = ViewBag.OpenGraphTags as Dictionary<string, string>;
+        if (ogTags != null)
+        {
+            foreach (var tag in ogTags)
+            {
+                <meta property="@tag.Key" content="@tag.Value" />
+            }
+        }
+    }
+    
+    @* Twitter Card Tags *@
+    @if (ViewBag.TwitterCardTags != null)
+    {
+        var twitterTags = ViewBag.TwitterCardTags as Dictionary<string, string>;
+        if (twitterTags != null)
+        {
+            foreach (var tag in twitterTags)
+            {
+                <meta name="@tag.Key" content="@tag.Value" />
+            }
+        }
+    }
+    
+    @* Canonical URL *@
+    @if (ViewBag.CanonicalUrl != null)
+    {
+        <link rel="canonical" href="@ViewBag.CanonicalUrl" />
+    }
+    
+    @* Schema.org Structured Data *@
+    @if (ViewBag.StructuredData != null)
+    {
+        <script type="application/ld+json">
+            @Html.Raw(ViewBag.StructuredData)
+        </script>
+    }
+    
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" href="~/favicon.ico" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="logo">@siteName</a>
+                <ul class="nav-menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year @siteName. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/feed/rss">RSS Feed</a>
+                <a href="/sitemap.xml">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js"></script>
+</body>
+</html>

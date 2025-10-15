@@ -1,0 +1,80 @@
+@using Umbraco.Cms.Web.Common.PublishedModels
+@using TheSiliconPost.Models
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = "_Layout.cshtml";
+    ViewBag.Title = "Home";
+    
+    // Get all blog posts
+    var blogPosts = Model.Root()
+        .DescendantsOrSelfOfType("blogPost")
+        .OrderByDescending(x => x.Value<DateTime>("publishDate"))
+        .Take(10)
+        .Select(x => new BlogPost(x, null))
+        .ToList();
+}
+
+<div class="home-page">
+    <section class="hero">
+        <h1>Welcome to The Silicon Post</h1>
+        <p>Exploring technology, AI, cloud computing, and modern software development</p>
+    </section>
+    
+    <section class="latest-posts">
+        <h2>Latest Articles</h2>
+        
+        @if (blogPosts.Any())
+        {
+            <div class="posts-grid">
+                @foreach (var post in blogPosts)
+                {
+                    <article class="post-card">
+                        @if (post.FeaturedImage != null)
+                        {
+                            <a href="@post.Url">
+                                <img src="@post.FeaturedImage.Url()" alt="@post.Title" class="post-thumbnail" />
+                            </a>
+                        }
+                        
+                        <div class="post-card-content">
+                            <h3><a href="@post.Url">@post.Title</a></h3>
+                            
+                            <div class="post-meta">
+                                <time datetime="@post.PublishDate.ToString("yyyy-MM-dd")">
+                                    @post.PublishDate.ToString("MMM dd, yyyy")
+                                </time>
+                                
+                                @if (post.Author != null)
+                                {
+                                    <span>by @post.Author.Name</span>
+                                }
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(post.Excerpt))
+                            {
+                                <p>@post.Excerpt</p>
+                            }
+                            
+                            @if (post.Categories.Any())
+                            {
+                                <div class="post-categories">
+                                    @foreach (var category in post.Categories)
+                                    {
+                                        <a href="@category.Url" class="category-badge">@category.Name</a>
+                                    }
+                                </div>
+                            }
+                            
+                            <a href="@post.Url" class="read-more">Read More →</a>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <p>No blog posts found. Create your first post in the Umbraco backoffice!</p>
+        }
+    </section>
+</div>

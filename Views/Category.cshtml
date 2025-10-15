@@ -1,0 +1,72 @@
+@using Umbraco.Cms.Web.Common.PublishedModels
+@using TheSiliconPost.Models
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = "_Layout.cshtml";
+    
+    var category = new Category(Model, null);
+    ViewBag.Title = category.Name;
+    ViewBag.MetaDescription = category.Description ?? $"Articles in {category.Name}";
+    
+    // Get all blog posts in this category
+    var blogPosts = Model.Root()
+        .DescendantsOrSelfOfType("blogPost")
+        .Where(x => x.Value<IEnumerable<IPublishedContent>>("categories")?.Any(c => c.Id == Model.Id) ?? false)
+        .OrderByDescending(x => x.Value<DateTime>("publishDate"))
+        .Select(x => new BlogPost(x, null))
+        .ToList();
+}
+
+<div class="category-page">
+    <header class="page-header">
+        <h1>@category.Name</h1>
+        @if (!string.IsNullOrEmpty(category.Description))
+        {
+            <p class="category-description">@category.Description</p>
+        }
+        <p class="post-count">@blogPosts.Count @(blogPosts.Count == 1 ? "article" : "articles")</p>
+    </header>
+    
+    @if (blogPosts.Any())
+    {
+        <div class="posts-list">
+            @foreach (var post in blogPosts)
+            {
+                <article class="post-item">
+                    @if (post.FeaturedImage != null)
+                    {
+                        <a href="@post.Url" class="post-image">
+                            <img src="@post.FeaturedImage.Url()" alt="@post.Title" />
+                        </a>
+                    }
+                    
+                    <div class="post-info">
+                        <h2><a href="@post.Url">@post.Title</a></h2>
+                        
+                        <div class="post-meta">
+                            <time datetime="@post.PublishDate.ToString("yyyy-MM-dd")">
+                                @post.PublishDate.ToString("MMMM dd, yyyy")
+                            </time>
+                            @if (post.Author != null)
+                            {
+                                <span>by @post.Author.Name</span>
+                            }
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(post.Excerpt))
+                        {
+                            <p>@post.Excerpt</p>
+                        }
+                        
+                        <a href="@post.Url" class="read-more">Read More →</a>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No articles found in this category yet.</p>
+    }
+</div>

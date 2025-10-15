@@ -1,0 +1,110 @@
+@using Umbraco.Cms.Web.Common.PublishedModels
+@using TheSiliconPost.Models
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = "_Layout.cshtml";
+    
+    var author = new Author(Model, null);
+    ViewBag.Title = author.Name;
+    ViewBag.MetaDescription = author.Bio ?? $"Articles by {author.Name}";
+    
+    // Get all blog posts by this author
+    var blogPosts = Model.Root()
+        .DescendantsOrSelfOfType("blogPost")
+        .Where(x => x.Value<IPublishedContent>("author")?.Id == Model.Id)
+        .OrderByDescending(x => x.Value<DateTime>("publishDate"))
+        .Select(x => new BlogPost(x, null))
+        .ToList();
+}
+
+<div class="author-page">
+    <header class="page-header author-header">
+        @if (author.Avatar != null)
+        {
+            <img src="@author.Avatar.Url()" alt="@author.Name" class="author-avatar-large" />
+        }
+        
+        <div class="author-info">
+            <h1>@author.Name</h1>
+            
+            @if (!string.IsNullOrEmpty(author.Bio))
+            {
+                <p class="author-bio">@author.Bio</p>
+            }
+            
+            <div class="author-social-links">
+                @if (!string.IsNullOrEmpty(author.Email))
+                {
+                    <a href="mailto:@author.Email" class="social-link">Email</a>
+                }
+                @if (!string.IsNullOrEmpty(author.Twitter))
+                {
+                    <a href="https://twitter.com/@author.Twitter" target="_blank" rel="noopener" class="social-link">Twitter</a>
+                }
+                @if (!string.IsNullOrEmpty(author.GitHub))
+                {
+                    <a href="https://github.com/@author.GitHub" target="_blank" rel="noopener" class="social-link">GitHub</a>
+                }
+                @if (!string.IsNullOrEmpty(author.LinkedIn))
+                {
+                    <a href="https://linkedin.com/in/@author.LinkedIn" target="_blank" rel="noopener" class="social-link">LinkedIn</a>
+                }
+            </div>
+            
+            <p class="post-count">@blogPosts.Count @(blogPosts.Count == 1 ? "article" : "articles")</p>
+        </div>
+    </header>
+    
+    @if (blogPosts.Any())
+    {
+        <section class="author-posts">
+            <h2>Articles by @author.Name</h2>
+            
+            <div class="posts-list">
+                @foreach (var post in blogPosts)
+                {
+                    <article class="post-item">
+                        @if (post.FeaturedImage != null)
+                        {
+                            <a href="@post.Url" class="post-image">
+                                <img src="@post.FeaturedImage.Url()" alt="@post.Title" />
+                            </a>
+                        }
+                        
+                        <div class="post-info">
+                            <h3><a href="@post.Url">@post.Title</a></h3>
+                            
+                            <div class="post-meta">
+                                <time datetime="@post.PublishDate.ToString("yyyy-MM-dd")">
+                                    @post.PublishDate.ToString("MMMM dd, yyyy")
+                                </time>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(post.Excerpt))
+                            {
+                                <p>@post.Excerpt</p>
+                            }
+                            
+                            @if (post.Categories.Any())
+                            {
+                                <div class="post-categories">
+                                    @foreach (var category in post.Categories)
+                                    {
+                                        <a href="@category.Url" class="category-badge">@category.Name</a>
+                                    }
+                                </div>
+                            }
+                            
+                            <a href="@post.Url" class="read-more">Read More →</a>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        <p>No articles published yet.</p>
+    }
+</div>

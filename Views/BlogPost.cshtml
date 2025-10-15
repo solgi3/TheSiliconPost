@@ -1,0 +1,114 @@
+@using Umbraco.Cms.Web.Common.PublishedModels
+@using TheSiliconPost.Models
+@using TheSiliconPost.Helpers
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject IConfiguration Configuration
+@{
+    Layout = "_Layout.cshtml";
+    
+    var blogPost = new BlogPost(Model, null);
+    var seoHelper = new SeoHelper(Configuration);
+    
+    ViewBag.Title = blogPost.Title;
+    ViewBag.MetaDescription = seoHelper.GetMetaDescription(blogPost);
+    ViewBag.CanonicalUrl = seoHelper.GetCanonicalUrl(blogPost);
+    ViewBag.OpenGraphTags = seoHelper.GetOpenGraphTags(blogPost);
+    ViewBag.TwitterCardTags = seoHelper.GetTwitterCardTags(blogPost);
+    ViewBag.StructuredData = seoHelper.GetStructuredData(blogPost);
+}
+
+<article class="blog-post">
+    <header class="post-header">
+        @if (blogPost.FeaturedImage != null)
+        {
+            <img src="@blogPost.FeaturedImage.Url()" alt="@blogPost.Title" class="featured-image" />
+        }
+        
+        <h1>@blogPost.Title</h1>
+        
+        <div class="post-meta">
+            <time datetime="@blogPost.PublishDate.ToString("yyyy-MM-dd")">
+                @blogPost.PublishDate.ToString("MMMM dd, yyyy")
+            </time>
+            
+            @if (blogPost.Author != null)
+            {
+                <span class="author">
+                    By <a href="@blogPost.Author.Url">@blogPost.Author.Name</a>
+                </span>
+            }
+            
+            @if (blogPost.Categories.Any())
+            {
+                <span class="categories">
+                    in 
+                    @foreach (var category in blogPost.Categories)
+                    {
+                        <a href="@category.Url">@category.Name</a>
+                        @if (category != blogPost.Categories.Last())
+                        {
+                            <text>, </text>
+                        }
+                    }
+                </span>
+            }
+        </div>
+        
+        @if (!string.IsNullOrEmpty(blogPost.Excerpt))
+        {
+            <div class="post-excerpt">
+                <p>@blogPost.Excerpt</p>
+            </div>
+        }
+    </header>
+    
+    <div class="post-content">
+        @Html.Raw(blogPost.Content)
+    </div>
+    
+    @if (blogPost.Tags.Any())
+    {
+        <footer class="post-footer">
+            <div class="tags">
+                <strong>Tags:</strong>
+                @foreach (var tag in blogPost.Tags)
+                {
+                    <a href="@tag.Url" class="tag">@tag.Name</a>
+                }
+            </div>
+        </footer>
+    }
+    
+    @if (blogPost.Author != null)
+    {
+        <section class="author-bio">
+            <div class="author-info">
+                @if (blogPost.Author.Avatar != null)
+                {
+                    <img src="@blogPost.Author.Avatar.Url()" alt="@blogPost.Author.Name" class="author-avatar" />
+                }
+                <div class="author-details">
+                    <h3>About @blogPost.Author.Name</h3>
+                    @if (!string.IsNullOrEmpty(blogPost.Author.Bio))
+                    {
+                        <p>@blogPost.Author.Bio</p>
+                    }
+                    <div class="author-social">
+                        @if (!string.IsNullOrEmpty(blogPost.Author.Twitter))
+                        {
+                            <a href="https://twitter.com/@blogPost.Author.Twitter" target="_blank" rel="noopener">Twitter</a>
+                        }
+                        @if (!string.IsNullOrEmpty(blogPost.Author.GitHub))
+                        {
+                            <a href="https://github.com/@blogPost.Author.GitHub" target="_blank" rel="noopener">GitHub</a>
+                        }
+                        @if (!string.IsNullOrEmpty(blogPost.Author.LinkedIn))
+                        {
+                            <a href="https://linkedin.com/in/@blogPost.Author.LinkedIn" target="_blank" rel="noopener">LinkedIn</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+</article>

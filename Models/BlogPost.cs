@@ -26,6 +26,15 @@ namespace TheSiliconPost.Models
         public IEnumerable<Tag> Tags => this.Value<IEnumerable<IPublishedContent>>("tags")
             ?.Select(x => new Tag(x, PublishedValueFallback)) ?? Enumerable.Empty<Tag>();
         
+        public Author? Author
+        {
+            get
+            {
+                var authorContent = this.Value<IPublishedContent>("author");
+                return authorContent != null ? new Author(authorContent, PublishedValueFallback) : null;
+            }
+        }
+        
         public string MetaDescription => this.Value<string>("metaDescription") ?? Excerpt;
         public string MetaKeywords => this.Value<string>("metaKeywords");
         public IPublishedContent OgImage => this.Value<IPublishedContent>("ogImage") ?? FeaturedImage;
