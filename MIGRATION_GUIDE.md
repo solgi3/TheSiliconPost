@@ -17,10 +17,12 @@ The easiest method - fetches content directly from WordPress REST API.
 **Steps:**
 
 1. Verify WordPress REST API is accessible:
+
    - Visit: `https://your-wordpress-site.com/wp-json/wp/v2/posts`
    - You should see JSON output
 
 2. In Umbraco, create parent folders for content:
+
    - Categories folder (note the ID)
    - Tags folder (note the ID)
    - Posts folder (note the ID)
@@ -32,25 +34,25 @@ The easiest method - fetches content directly from WordPress REST API.
 public class MigrationController : SurfaceController
 {
     private readonly WordPressMigrationService _migrationService;
-    
+
     public async Task<IActionResult> MigrateFromWordPress()
     {
         var wordPressUrl = "https://your-wordpress-site.com";
         var postsParentId = 1234; // Replace with your posts folder ID
-        
+
         // Import categories first
         var categoriesResult = await _migrationService.ImportCategoriesAsync(wordPressUrl, categoriesParentId);
-        
+
         // Import tags
         var tagsResult = await _migrationService.ImportTagsAsync(wordPressUrl, tagsParentId);
-        
+
         // Import posts
         var postsResult = await _migrationService.ImportFromRestApiAsync(wordPressUrl, postsParentId);
-        
-        return Ok(new { 
+
+        return Ok(new {
             categories = categoriesResult,
             tags = tagsResult,
-            posts = postsResult 
+            posts = postsResult
         });
     }
 }
@@ -63,6 +65,7 @@ For sites where REST API is disabled or you have XML export files.
 **Steps:**
 
 1. Export from WordPress:
+
    - Go to **Tools → Export**
    - Select **All content**
    - Download the XML file
@@ -82,6 +85,7 @@ For advanced users with direct database access.
 **Steps:**
 
 1. Export WordPress database tables:
+
    - `wp_posts`
    - `wp_postmeta`
    - `wp_terms`
@@ -131,6 +135,7 @@ var redirects = new Dictionary<string, string>
 ```
 
 **Implementation options:**
+
 - IContentFinder in Umbraco
 - IIS URL Rewrite module
 - Cloudflare page rules
@@ -181,6 +186,7 @@ After migration, review and fix:
 **Problem:** Can't access `/wp-json/wp/v2/posts`
 
 **Solutions:**
+
 - Check WordPress REST API is enabled (Settings → Permalinks → Save)
 - Verify no security plugins are blocking the REST API
 - Check .htaccess rules aren't blocking JSON endpoints
@@ -190,6 +196,7 @@ After migration, review and fix:
 **Problem:** Migration runs but no content appears
 
 **Solutions:**
+
 - Check Umbraco document types match service aliases (`blogPost`, `category`, `tag`)
 - Verify property aliases match exactly (case-sensitive)
 - Check Umbraco logs for errors
@@ -200,6 +207,7 @@ After migration, review and fix:
 **Problem:** Posts import but images are broken
 
 **Solutions:**
+
 - Manually download WordPress uploads folder
 - Update image URLs in post content
 - Use find/replace to update image domains

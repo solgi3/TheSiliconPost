@@ -23,8 +23,8 @@ namespace TheSiliconPost.Helpers
         /// <summary>
         /// Create a BlogListingViewModel with pagination
         /// </summary>
-        public static BlogListingViewModel CreateBlogListing<T>(
-            IEnumerable<T> allItems,
+        public static BlogListingViewModel CreateBlogListing(
+            IEnumerable<TheSiliconPost.Models.BlogPost> allItems,
             int currentPage,
             int pageSize = 10,
             string? searchQuery = null,
@@ -40,7 +40,7 @@ namespace TheSiliconPost.Helpers
             
             return new BlogListingViewModel
             {
-                Posts = paginatedItems.Cast<dynamic>(), // Will work with BlogPost items
+                Posts = paginatedItems,
                 CurrentPage = currentPage,
                 PageSize = pageSize,
                 TotalItems = totalItems,

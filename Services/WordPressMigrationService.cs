@@ -104,7 +104,8 @@ namespace TheSiliconPost.Services
             // TODO: Import categories and tags
             // TODO: Import author
 
-            _contentService.SaveAndPublish(content);
+            _contentService.Save(content);
+            _contentService.Publish(content, Array.Empty<string>());
         }
 
         /// <summary>
@@ -139,7 +140,8 @@ namespace TheSiliconPost.Services
                         content.SetValue("name", category.Name ?? "");
                         content.SetValue("description", category.Description ?? "");
 
-                        _contentService.SaveAndPublish(content);
+                        _contentService.Save(content);
+                        _contentService.Publish(content, Array.Empty<string>());
                         result.ImportedCount++;
                         _logger.LogInformation($"Imported category: {category.Name}");
                     }
@@ -191,7 +193,8 @@ namespace TheSiliconPost.Services
 
                         content.SetValue("name", tag.Name ?? "");
 
-                        _contentService.SaveAndPublish(content);
+                        _contentService.Save(content);
+                        _contentService.Publish(content, Array.Empty<string>());
                         result.ImportedCount++;
                         _logger.LogInformation($"Imported tag: {tag.Name}");
                     }
@@ -230,7 +233,8 @@ namespace TheSiliconPost.Services
                 var fileName = Path.GetFileName(new Uri(mediaUrl).LocalPath);
                 
                 var media = _mediaService.CreateMedia(fileName, parentId, "Image");
-                media.SetValue(_mediaService, "umbracoFile", fileName, stream);
+                // TODO: Implement proper media file upload using Umbraco's media file system
+                // media.SetValue("umbracoFile", fileName);
                 
                 _mediaService.Save(media);
                 

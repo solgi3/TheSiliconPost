@@ -10,13 +10,13 @@ namespace TheSiliconPost.Models
         {
         }
 
-        public string Name => this.Value<string>("name") ?? this.Name;
-        public string Bio => this.Value<string>("bio");
-        public string Email => this.Value<string>("email");
-        public string Twitter => this.Value<string>("twitter");
-        public string GitHub => this.Value<string>("github");
-        public string LinkedIn => this.Value<string>("linkedin");
-        public IPublishedContent Avatar => this.Value<IPublishedContent>("avatar");
+        public new string Name => this.Value<string>("name") ?? base.Name;
+        public string? Bio => this.Value<string>("bio");
+        public string? Email => this.Value<string>("email");
+        public string? Twitter => this.Value<string>("twitter");
+        public string? GitHub => this.Value<string>("github");
+        public string? LinkedIn => this.Value<string>("linkedin");
+        public IPublishedContent? Avatar => this.Value<IPublishedContent>("avatar");
         public string Url => this.Url();
     }
 }

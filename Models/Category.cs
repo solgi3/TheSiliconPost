@@ -10,9 +10,9 @@ namespace TheSiliconPost.Models
         {
         }
 
-        public string Name => this.Value<string>("name") ?? this.Name;
-        public string Description => this.Value<string>("description");
-        public string Slug => this.UrlSegment;
+        public new string Name => this.Value<string>("name") ?? base.Name;
+        public string? Description => this.Value<string>("description");
+        public string? Slug => this.UrlSegment;
         public string Url => this.Url();
     }
 }
