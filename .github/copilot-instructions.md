@@ -159,3 +159,101 @@ var posts = UmbracoContext.Content.GetAtRoot()
     .OrderByDescending(x => x.Value<DateTime>("publishDate"))
     .Take(50);
 ```
+
+## WordPress Migration Strategy
+
+### Content Export Options
+
+1. **WordPress REST API** (Recommended)
+
+   - Export posts: `GET /wp-json/wp/v2/posts`
+   - Export categories: `GET /wp-json/wp/v2/categories`
+   - Export tags: `GET /wp-json/wp/v2/tags`
+   - Export media: `GET /wp-json/wp/v2/media`
+
+2. **XML Export**
+
+   - Tools → Export → All content
+   - Parse XML with C# `XDocument`
+
+3. **Direct Database Export**
+   - Export `wp_posts`, `wp_terms`, `wp_postmeta` tables
+   - Create migration script to transform and import
+
+### URL Mapping Strategy
+
+WordPress typically uses patterns like:
+
+- `/{year}/{month}/{day}/{slug}/` (default)
+- `/{category}/{slug}/`
+- `/{slug}/`
+
+Umbraco strategy:
+
+- Use same slug structure in Umbraco
+- Create `UrlRewriteController` or `IContentFinder` for legacy URL support
+- Generate 301 redirects map from old URLs to new URLs
+- Store redirects in Umbraco or separate redirect table
+
+### Migration Checklist
+
+- [ ] Export all WordPress posts with metadata
+- [ ] Download all media files from WordPress
+- [ ] Create content types in Umbraco (blogPost, author, category, tag)
+- [ ] Import authors first (reference by ID)
+- [ ] Import categories and tags
+- [ ] Import posts with proper relationships
+- [ ] Upload media to Umbraco Media Library
+- [ ] Test content rendering
+- [ ] Create URL redirect rules
+- [ ] Set up analytics tracking
+- [ ] Configure caching strategy
+
+## Deployment
+
+### Production Requirements
+
+- .NET 9 Runtime
+- SQL Server 2019+ or Azure SQL Database
+- IIS 10+ or Azure App Service
+- HTTPS certificate (Let's Encrypt or commercial)
+
+### Environment Variables
+
+Set in production `appsettings.Production.json`:
+
+```json
+{
+  "ConnectionStrings": {
+    "umbracoDbDSN": "Server=...;Database=...;User Id=...;Password=..."
+  },
+  "SiteSettings": {
+    "Url": "https://thesiliconpost.com"
+  },
+  "Umbraco": {
+    "CMS": {
+      "Hosting": {
+        "Debug": false
+      }
+    }
+  }
+}
+```
+
+### Deployment Steps
+
+1. Publish application: `dotnet publish -c Release`
+2. Upload to server or Azure App Service
+3. Configure connection strings
+4. Run database migrations (Umbraco handles automatically)
+5. Set up SSL certificate
+6. Configure CDN for static assets (optional)
+7. Enable output caching for better performance
+
+### Performance Optimization
+
+- Enable output caching for blog posts
+- Use Azure CDN or Cloudflare for static assets
+- Configure SQL Server performance (indexes, execution plans)
+- Implement `IMemoryCache` for frequently accessed data
+- Consider Redis for distributed caching in multi-server environments
