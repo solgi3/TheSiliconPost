@@ -1,4 +1,9 @@
+using TheSiliconPost.Services;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Register custom services
+builder.Services.AddScoped<UmbracoSetupService>();
 
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
